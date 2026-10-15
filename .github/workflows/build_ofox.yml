@@ -138,21 +138,27 @@ jobs:
 
     - name: Set Date Variables
       run: |
-        echo "DATE_SHORT=$(date +%Y%m%d)" >> $GITHUB_ENV
-        echo "DATE_TAG=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+        echo "DATE_SHORT=$(date +%Y%m%d)" >> "$GITHUB_ENV"
+        echo "DATE_TAG=$(date +%Y%m%d%H%M%S)" >> "$GITHUB_ENV"
 
-    - name: Archive files
+    - name: Prepare release files
       run: |
-        cd ${{ env.WORKSPACE }}/fox_${{ env.MANIFEST_BRANCH }}/out/target/product/${{ env.DEVICE_NAME }}
-        mv OrangeFox-${{ env.OFOX_VERSION }}-${{ env.DEVICE_NAME }}.img.tar OrangeFox-${{ env.OFOX_VERSION }}-${{ env.DEVICE_NAME }}.tar
+        set -euo pipefail
+        PRODUCT_DIR="${{ env.WORKSPACE }}/fox_${{ env.MANIFEST_BRANCH }}/out/target/product/${{ env.DEVICE_NAME }}"
+        IMAGE="$(find "$PRODUCT_DIR" -maxdepth 1 -type f -name "OrangeFox-*-${{ env.DEVICE_NAME }}.img" -print -quit)"
+        ZIP="$(find "$PRODUCT_DIR" -maxdepth 1 -type f -name "OrangeFox-*-${{ env.DEVICE_NAME }}.zip" -print -quit)"
+        test -s "$IMAGE"
+        test -s "$ZIP"
+        cp -- "$IMAGE" "$PRODUCT_DIR/recovery.img"
+        cp -- "$ZIP" "$PRODUCT_DIR/OrangeFox-${{ env.DEVICE_NAME }}.zip"
+        ls -lh "$PRODUCT_DIR/recovery.img" "$PRODUCT_DIR/OrangeFox-${{ env.DEVICE_NAME }}.zip"
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v3
       with:
         files: |
-          ${{ env.WORKSPACE }}/fox_${{ env.MANIFEST_BRANCH }}/out/target/product/${{ env.DEVICE_NAME }}/OrangeFox-${{ env.OFOX_VERSION }}-${{ env.DEVICE_NAME }}.img
-          ${{ env.WORKSPACE }}/fox_${{ env.MANIFEST_BRANCH }}/out/target/product/${{ env.DEVICE_NAME }}/OrangeFox-${{ env.OFOX_VERSION }}-${{ env.DEVICE_NAME }}.tar
-          ${{ env.WORKSPACE }}/fox_${{ env.MANIFEST_BRANCH }}/out/target/product/${{ env.DEVICE_NAME }}/OrangeFox-${{ env.OFOX_VERSION }}-${{ env.DEVICE_NAME }}.zip
+          ${{ env.WORKSPACE }}/fox_${{ env.MANIFEST_BRANCH }}/out/target/product/${{ env.DEVICE_NAME }}/recovery.img
+          ${{ env.WORKSPACE }}/fox_${{ env.MANIFEST_BRANCH }}/out/target/product/${{ env.DEVICE_NAME }}/OrangeFox-${{ env.DEVICE_NAME }}.zip
         name: ofox-${{ env.DEVICE_NAME }}-${{ env.DATE_SHORT }}
         tag_name: ${{ env.DATE_TAG }}
         body: |
