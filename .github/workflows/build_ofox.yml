@@ -136,7 +136,7 @@ jobs:
         lunch ${{ env.MAKEFILE_NAME }}-eng && make clean && mka adbd ${{ env.BUILD_TARGET }}image -j$(nproc --all)
       continue-on-error: false
 
-    - name: Set Date Variables
+        - name: Set Date Variables
       run: |
         echo "DATE_SHORT=$(date +%Y%m%d)" >> "$GITHUB_ENV"
         echo "DATE_TAG=$(date +%Y%m%d%H%M%S)" >> "$GITHUB_ENV"
@@ -151,13 +151,16 @@ jobs:
         test -s "$ZIP"
         cp -- "$IMAGE" "$PRODUCT_DIR/recovery.img"
         cp -- "$ZIP" "$PRODUCT_DIR/OrangeFox-${{ env.DEVICE_NAME }}.zip"
-        ls -lh "$PRODUCT_DIR/recovery.img" "$PRODUCT_DIR/OrangeFox-${{ env.DEVICE_NAME }}.zip"
+        tar -cf "$PRODUCT_DIR/OrangeFox-${{ env.DEVICE_NAME }}.tar" -C "$PRODUCT_DIR" recovery.img
+        tar -tf "$PRODUCT_DIR/OrangeFox-${{ env.DEVICE_NAME }}.tar"
+        ls -lh "$PRODUCT_DIR/recovery.img" "$PRODUCT_DIR/OrangeFox-${{ env.DEVICE_NAME }}.tar" "$PRODUCT_DIR/OrangeFox-${{ env.DEVICE_NAME }}.zip"
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v3
       with:
         files: |
           ${{ env.WORKSPACE }}/fox_${{ env.MANIFEST_BRANCH }}/out/target/product/${{ env.DEVICE_NAME }}/recovery.img
+          ${{ env.WORKSPACE }}/fox_${{ env.MANIFEST_BRANCH }}/out/target/product/${{ env.DEVICE_NAME }}/OrangeFox-${{ env.DEVICE_NAME }}.tar
           ${{ env.WORKSPACE }}/fox_${{ env.MANIFEST_BRANCH }}/out/target/product/${{ env.DEVICE_NAME }}/OrangeFox-${{ env.DEVICE_NAME }}.zip
         name: ofox-${{ env.DEVICE_NAME }}-${{ env.DATE_SHORT }}
         tag_name: ${{ env.DATE_TAG }}
