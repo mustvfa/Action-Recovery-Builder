@@ -14,23 +14,23 @@ on:
       DEVICE_TREE_URL:
         description: Device Tree URL
         required: true
-        default: 'https://github.com/saadelasfur/orangefox_device_samsung_m52xq.git'
+        default: 'https://github.com/mustvfa/android_device_samsung_a21s-twrp.git'
       DEVICE_TREE_BRANCH:
         description: Device Tree Branch
         required: true
-        default: 'fox_12.1'
+        default: 'TWRP'
       DEVICE_PATH:
         description: Device Path
         required: true
-        default: 'device/samsung/m52xq'
+        default: 'device/samsung/a21s'
       DEVICE_NAME:
         description: Device Name
         required: true
-        default: 'm52xq'
+        default: 'a21s'
       MAKEFILE_NAME:
         description: Makefile Name
         required: true
-        default: 'twrp_m52xq'
+        default: 'twrp_a21s'
       BUILD_TARGET:
         description: Build Target
         required: true
