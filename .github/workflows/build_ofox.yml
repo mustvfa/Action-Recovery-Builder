@@ -136,7 +136,7 @@ jobs:
         lunch ${{ env.MAKEFILE_NAME }}-eng && make clean && mka adbd ${{ env.BUILD_TARGET }}image -j$(nproc --all)
       continue-on-error: false
 
-        - name: Set Date Variables
+    - name: Set Date Variables
       run: |
         echo "DATE_SHORT=$(date +%Y%m%d)" >> "$GITHUB_ENV"
         echo "DATE_TAG=$(date +%Y%m%d%H%M%S)" >> "$GITHUB_ENV"
